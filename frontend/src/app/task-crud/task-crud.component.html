@@ -1,0 +1,50 @@
+<h2 class="text-primary">{{ "tasks" | translate }}</h2>
+<h5>
+  <a href="http://localhost:8080/q/swagger-ui/">{{ "swagger_ui" | translate }}</a>
+</h5>
+
+<ul class="list-group w-25">
+  <li
+    class="list-group-item d-flex justify-content-between align-items-center"
+    *ngFor="let task of taskService.tasks"
+  >
+    <span *ngIf="!editTask || editTask.id !== task.id">
+      {{ task.name }}
+      <div>
+        <button class="btn btn-sm btn-warning me-2" (click)="startEdit(task)">
+          {{ "edit" | translate }}
+        </button>
+        <button class="btn btn-sm btn-danger" (click)="deleteTask(task.id!)">
+          {{ "delete" | translate }}
+        </button>
+      </div>
+    </span>
+    <span *ngIf="editTask && editTask.id === task.id">
+      <input class="form-control d-inline w-100" [(ngModel)]="editTask.name" />
+      <div>
+        <button
+          class="btn btn-sm btn-success me-2"
+          (click)="updateTask()"
+          [disabled]="!(editTask.name | validLength : 3 : 50)"
+        >
+          {{ "save" | translate }}
+        </button>
+        <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">
+          {{ "cancel" | translate }}
+        </button>
+      </div>
+    </span>
+  </li>
+</ul>
+
+<h3 class="mt-4">{{ "add_task" | translate }}</h3>
+<div class="input-group mb-3 w-25">
+  <input class="form-control" [(ngModel)]="newTask.name" />
+  <button
+    class="btn btn-primary"
+    (click)="addTask()"
+    [disabled]="!(newTask.name | validLength : 3 : 50)"
+  >
+    {{ "add" | translate }}
+  </button>
+</div>

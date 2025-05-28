@@ -1,0 +1,11 @@
+{
+  "tasks": "Tasks",
+  "swagger_ui": "Swagger UI",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
+  "cancel": "Cancel",
+  "add_task": "Add Task",
+  "name_placeholder": "Name",
+  "add": "Add"
+}

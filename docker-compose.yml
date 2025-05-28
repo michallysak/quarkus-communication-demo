@@ -1,0 +1,39 @@
+version: "3.5"
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+
+  mongo-express:
+    image: mongo-express:1-20
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
+      ME_CONFIG_MONGODB_SERVER: ${ME_CONFIG_MONGODB_SERVER}
+      ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT}
+    ports:
+      - "8081:8081"
+    networks:
+      - mongo
+    depends_on:
+      - mongo
+
+networks:
+  mongo:
+    name: mongo
+
+volumes:
+  mongo_data:
+  mongo_config:
