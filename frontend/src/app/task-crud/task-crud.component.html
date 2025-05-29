@@ -1,17 +1,54 @@
+<fieldset class="btn-group" aria-label="Service toggle">
+  <input
+    type="radio"
+    class="btn-check"
+    name="serviceToggle"
+    id="useRestAPI"
+    autocomplete="off"
+    [checked]="!useGraphQL"
+    (change)="useGraphQL = false"
+  />
+  <label class="btn btn-outline-primary" for="useRestAPI">RestAPI</label>
+  <input
+    type="radio"
+    class="btn-check"
+    name="serviceToggle"
+    id="useGraphQL"
+    autocomplete="off"
+    [checked]="useGraphQL"
+    (change)="useGraphQL = true"
+  />
+  <label class="btn btn-outline-primary" for="useGraphQL">GraphQL</label>
+</fieldset>
+
 <h2 class="text-primary">{{ "tasks" | translate }}</h2>
 <h5>
-  <a href="http://localhost:8080/q/swagger-ui/">{{ "swagger_ui" | translate }}</a>
+  <a href="http://localhost:8080/q/swagger-ui">{{
+    "swagger_ui" | translate
+  }}</a>
+  <br />
+  <a href="http://localhost:8080/q/openapi">openapi.yaml</a>
+  <br />
+  <a href="http://localhost:8080/q/graphql-ui">{{
+    "graphql_ui" | translate
+  }}</a>
+  <br />
+  <a href="http://localhost:8080/graphql/schema.graphql">schema.graphql</a>
+  <br />
 </h5>
 
 <ul class="list-group w-25">
   <li
     class="list-group-item d-flex justify-content-between align-items-center"
-    *ngFor="let task of taskService.tasks"
+    *ngFor="let task of tasks"
   >
     <span *ngIf="!editTask || editTask.id !== task.id">
       {{ task.name }}
       <div>
-        <button class="btn btn-sm btn-warning me-2" (click)="startEdit(task)">
+        <button
+          class="btn btn-sm btn-warning me-2"
+          (click)="startEdit(task.id)"
+        >
           {{ "edit" | translate }}
         </button>
         <button class="btn btn-sm btn-danger" (click)="deleteTask(task.id!)">

@@ -64,12 +64,15 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "quarkus-communication-demo-frontend:build"
+          },
           "configurations": {
             "production": {
-              "browserTarget": "quarkus-communication-demo-frontend:build:production"
+              "buildTarget": "quarkus-communication-demo-frontend:build:production"
             },
             "development": {
-              "browserTarget": "quarkus-communication-demo-frontend:build:development"
+              "buildTarget": "quarkus-communication-demo-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -77,7 +80,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "quarkus-communication-demo-frontend:build"
+            "buildTarget": "quarkus-communication-demo-frontend:build"
           }
         },
         "test": {

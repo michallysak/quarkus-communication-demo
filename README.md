@@ -8,7 +8,7 @@ Show different approaches to system designing with Quarkus and Angular.
 
 ### Communication:
 1. [x] REST API
-2. [ ] GraphQL
+2. [x] GraphQL
 3. [ ] gRPC
 4. [ ] Webhook
 5. [ ] SSE (Server-Sent Events)

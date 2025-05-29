@@ -1,4 +1,7 @@
-export interface Task {
-  id?: string;
+export interface CreateTask {
   name: string;
+}
+
+export type Task = CreateTask & {
+  id: string;
 }

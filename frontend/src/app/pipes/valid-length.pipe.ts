@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'validLength'
+  name: 'validLength',
+  standalone: false
 })
 export class ValidLengthPipe<S, T extends string | S[]> implements PipeTransform {
   transform(value: T | undefined, min: number = 0, max: number = 100): boolean {

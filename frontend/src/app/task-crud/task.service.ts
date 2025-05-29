@@ -1,34 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Task } from './task.model';
-import { tap } from 'rxjs/operators';
+import { CreateTask, Task } from './task.model';
+import { TaskServiceInterface } from './task.service.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class TaskService {
+export class TaskRestService implements TaskServiceInterface {
   readonly apiBaseUrl = 'http://localhost:8080';
   readonly taskApiUrl = `${this.apiBaseUrl}/task`;
-  tasks: Task[] = [];
 
   constructor(private readonly http: HttpClient) {}
 
   getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.taskApiUrl).pipe(
-      tap(data => this.tasks = data)
-    );
+    return this.http.get<Task[]>(this.taskApiUrl);
   }
 
-  addTask(task: Task): Observable<void> {
-    return this.http.post<void>(this.taskApiUrl, task);
+  addTask(task: CreateTask): Observable<Task> {
+    return this.http.post<Task>(this.taskApiUrl, task);
   }
 
-  updateTask(task: Task): Observable<void> {
-    return this.http.put<void>(`${this.taskApiUrl}/${task.id}`, task);
+  updateTask(task: Task): Observable<Task> {
+    return this.http.put<Task>(`${this.taskApiUrl}/${task.id}`, task);
   }
 
   deleteTask(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.taskApiUrl}/${id}`);
+    return this.http.delete<void>(`${this.taskApiUrl}/${id}`)
+  }
+
+  deleteAllTasks(): Observable<void> {
+    return this.http.delete<void>(`${this.taskApiUrl}`);
   }
 }
