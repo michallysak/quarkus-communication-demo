@@ -1,0 +1,12 @@
+<h3 class="mt-4">{{ "add_task" | translate }}</h3>
+<div class="input-group mb-3 w-25">
+  <input class="form-control" [(ngModel)]="newTask.name" />
+  <button
+    class="btn btn-primary"
+    (click)="addTaskClick()"
+    [disabled]="!(newTask.name | validLength : 3 : 50)"
+  >
+    {{ "add" | translate }}
+  </button>
+</div>
+

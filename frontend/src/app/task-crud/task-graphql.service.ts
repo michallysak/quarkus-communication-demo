@@ -1,13 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CreateTask, Task } from './task.model';
 import { TaskServiceInterface } from './task.service.interface';
-import { Apollo, gql, MutationResult } from 'apollo-angular';
-import { ApolloQueryResult } from '@apollo/client/core';
+import { Apollo, gql } from 'apollo-angular';
+import { ApolloClient, FetchResult } from '@apollo/client/core';
+import { GRAPHQL_SUBSCRIPTION_CLIENT } from '../graphql/graphql.provider';
 
+interface TaskUpdatesResponse {
+  taskUpdates: Task;
+}
 
-function runCatching<T, U>(result: ApolloQueryResult<T> | MutationResult<T>, mapper: (a: NonNullable<T>) => U): U {
+function runCatching<T, U>(
+  result: FetchResult<T>,
+  mapper: (a: NonNullable<T>) => U
+): U {
   if (result.errors) {
     throw new Error(
       `GraphQL errors: ${result.errors.map((e: any) => e.message).join(', ')}`
@@ -19,12 +26,32 @@ function runCatching<T, U>(result: ApolloQueryResult<T> | MutationResult<T>, map
   return mapper(result.data);
 }
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class TaskGraphQLService implements TaskServiceInterface {
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly apollo: Apollo,
+    @Inject(GRAPHQL_SUBSCRIPTION_CLIENT)
+    private readonly subscriptionClient: ApolloClient<any>
+  ) {}
+
+  getTask(taskId: string): Observable<Task> {
+    const query = gql`
+      query {
+        taskById(id: "${taskId}") {
+          id
+          name
+          status
+        }
+      }`;
+
+    return this.apollo
+      .watchQuery<{ taskById: Task }>({ query })
+      .valueChanges.pipe(
+        map((result) => runCatching(result, (data) => data.taskById))
+      );
+  }
 
   getTasks(): Observable<Task[]> {
     const query = gql`
@@ -32,12 +59,15 @@ export class TaskGraphQLService implements TaskServiceInterface {
         allTasks {
           id
           name
+          status
         }
       }
     `;
     return this.apollo
       .watchQuery<{ allTasks: Task[] }>({ query })
-      .valueChanges.pipe(map((result) => runCatching(result, (data) => data.allTasks)));
+      .valueChanges.pipe(
+        map((result) => runCatching(result, (data) => data.allTasks))
+      );
   }
 
   addTask(task: CreateTask): Observable<Task> {
@@ -46,6 +76,7 @@ export class TaskGraphQLService implements TaskServiceInterface {
         createTask(taskCreateDto: { name: "${task.name}" }) {
           id
           name
+          status
         }
       }
     `;
@@ -60,6 +91,7 @@ export class TaskGraphQLService implements TaskServiceInterface {
         updateTask(id: "${task.id}", taskDto: { name: "${task.name}" }) {
           id
           name
+          status
         }
       }
     `;
@@ -88,5 +120,41 @@ export class TaskGraphQLService implements TaskServiceInterface {
     return this.apollo
       .mutate<{ deleteTask: boolean }>({ mutation })
       .pipe(map((result) => runCatching(result, () => {})));
+  }
+
+  processTask(taskId: string): Observable<void> {
+    const mutation = gql`
+      mutation {
+        processTask(id: "${taskId}")
+      }
+    `;
+    return this.apollo
+      .mutate<{ processTask: boolean }>({ mutation })
+      .pipe(map((result) => runCatching(result, () => {})));
+  }
+
+  subscribeToTaskUpdates(taskId: string): Observable<Task> {
+    const query = gql`
+      subscription {
+        taskUpdates(id: "${taskId}") {
+          id
+          name
+          status
+        }
+      }
+    `;
+
+    return new Observable((observer) => {
+      const subscriptionHandle = this.subscriptionClient
+        .subscribe<TaskUpdatesResponse>({ query })
+        .subscribe({
+          next: (result) =>
+            observer.next(runCatching(result, (data) => data.taskUpdates)),
+          error: (error) => observer.error(error),
+          complete: () => observer.complete(),
+        });
+
+      return () => subscriptionHandle.unsubscribe();
+    });
   }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.michallysak.task.domain.TaskCreateDto;
 import pl.michallysak.task.domain.TaskDto;
+import pl.michallysak.task.domain.TaskStatus;
 import pl.michallysak.utils.BaseIT;
 import pl.michallysak.utils.TestApiFactory;
 import pl.michallysak.utils.TestDataFactory;
@@ -165,6 +166,82 @@ class TaskResourceIT extends BaseIT {
         // and
         TestApiFactory.Tasks.getAll().then().statusCode(200).body("size()", equalTo(0));
     }
+
+    @Test
+    void testProcessTask() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestApiFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(201);
+        TaskDto createdTask = createResponse.as(TaskDto.class);
+        UUID taskId = createdTask.getId();
+
+        // when
+        Response processResponse = TestApiFactory.Tasks.processTask(taskId);
+
+        // then
+        processResponse.then().statusCode(200);
+        // and
+        Response getResponse = TestApiFactory.Tasks.getTaskById(taskId);
+        getResponse.then().statusCode(200)
+         .body("status", equalTo(TaskStatus.IN_PROGRESS.name()));
+    }
+
+    @Test
+    void testProcessTaskAgainShouldFail() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestApiFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(201);
+        TaskDto createdTask = createResponse.as(TaskDto.class);
+        UUID taskId = createdTask.getId();
+        // and
+        Response processResponse = TestApiFactory.Tasks.processTask(taskId);
+        processResponse.then().statusCode(200);
+
+        // when
+        Response processAgainResponse = TestApiFactory.Tasks.processTask(taskId);
+
+        // then
+        processAgainResponse.then().statusCode(400)
+            .body(equalTo("Task with id " + taskId + " is already started or completed."));
+    }
+
+    @Test
+    void testGetByIdWithLongPoll_whenBeforeProcessShould204() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestApiFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(201);
+        TaskDto createdTask = createResponse.as(TaskDto.class);
+        UUID taskId = createdTask.getId();
+
+        // when
+        Response longPollResponse = TestApiFactory.Tasks.longPollTask(taskId);
+
+        // then
+        longPollResponse.then().statusCode(204);
+    }
+
+    @Test
+    void testGetByIdWithLongPoll_whenBeforeProcessShould200() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestApiFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(201);
+        TaskDto createdTask = createResponse.as(TaskDto.class);
+        UUID taskId = createdTask.getId();
+
+        // when
+        TestApiFactory.Tasks.processTask(taskId).then().statusCode(200);
+        Response longPollAfterProcess = TestApiFactory.Tasks.longPollTask(taskId);
+
+        // then
+        longPollAfterProcess.then().statusCode(200)
+            .body("id", equalTo(taskId.toString()))
+            .body("status", equalTo(TaskStatus.COMPLETED.name()));
+    }
+
 
     public static Stream<Arguments> invalidTaskNames() {
         return Stream.of(

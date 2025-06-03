@@ -1,0 +1,38 @@
+<span *ngIf="!editTask || editTask.id !== task.id">
+  <div>
+    {{ task.name }}
+  </div>
+  <div>
+    <button class="btn btn-sm btn-warning me-2" (click)="startEdit()">
+      {{ "edit" | translate }}
+    </button>
+    <button class="btn btn-sm btn-danger me-2" (click)="deleteTask()">
+      {{ "delete" | translate }}
+    </button>
+    <button
+      [disabled]="task.status !== 'CREATED'"
+      class="btn btn-sm btn-info"
+      (click)="processTask(task.id)"
+    >
+      {{ "process" | translate }}
+    </button>
+  </div>
+</span>
+<span *ngIf="editTask && editTask.id === task.id">
+  <div>
+    <input class="form-control d-inline w-100" [(ngModel)]="editTask.name" />
+  </div>
+  <div>
+    <button
+      class="btn btn-sm btn-success me-2"
+      (click)="updateTask()"
+      [disabled]="!(editTask.name | validLength : 3 : 50)"
+    >
+      {{ "save" | translate }}
+    </button>
+    <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">
+      {{ "cancel" | translate }}
+    </button>
+  </div>
+</span>
+<app-task-status-badge [status]="task.status" />

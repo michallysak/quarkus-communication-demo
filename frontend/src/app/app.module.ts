@@ -12,6 +12,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { TaskRestService } from './task-crud/task.service';
 import { TaskGraphQLService } from './task-crud/task-graphql.service';
 import { graphqlProvider } from 'src/app/graphql/graphql.provider';
+import { TaskStatusBadgeComponent } from "./task-crud/task-status-badge/task-status-badge.component";
+import { TaskCrudSelectorCrudActionComponent } from './task-crud/task-crud-selector-crud-action/task-crud-selector-crud-action.component';
+import { TaskCrudSelectorLongTimeActionComponent } from './task-crud/task-crud-selector-long-time-action/task-crud-selector-long-time-action.component';
+import { TaskCrudLinksComponent } from './task-crud/task-crud-links/task-crud-links.component';
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
@@ -20,22 +24,26 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
 @NgModule({
   declarations: [
     AppComponent,
-    TaskCrudComponent,
-    ValidLengthPipe,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        defaultLanguage: 'en',
+        loader: {
+            provide: TranslateLoader,
+            useFactory: HttpLoaderFactory,
+            deps: [HttpClient]
+        }
     }),
-  ],
+    TaskStatusBadgeComponent,
+    TaskCrudSelectorCrudActionComponent,
+    TaskCrudSelectorLongTimeActionComponent,
+    TaskCrudComponent,
+    ValidLengthPipe,
+    TaskCrudLinksComponent
+],
   providers: [
     graphqlProvider,
     TaskRestService,

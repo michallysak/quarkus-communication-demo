@@ -1,0 +1,16 @@
+<h5 class="mt-4">{{ 'crud-method-process' | translate}} </h5>
+
+<fieldset class="btn-group" aria-label="Service toggle">
+  @for (action of actions; track $index) {
+    <input
+      type="radio"
+      class="btn-check"
+      name="serviceToggle"
+      [id]="action"
+      autocomplete="off"
+      [checked]="crudAction == action"
+      (change)="crudActionChange.emit(action)"
+    />
+    <label class="btn btn-outline-primary" [for]="action">{{ action | translate }}</label>
+  }
+</fieldset>

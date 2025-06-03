@@ -1,8 +1,7 @@
 package pl.michallysak.utils;
 
-import org.jetbrains.annotations.NotNull;
 import pl.michallysak.task.domain.TaskCreateDto;
-import pl.michallysak.task.domain.Task;
+import pl.michallysak.task.control.Task;
 import pl.michallysak.task.domain.TaskDto;
 
 import java.util.UUID;

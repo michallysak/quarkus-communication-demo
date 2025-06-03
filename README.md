@@ -13,12 +13,12 @@ Show different approaches to system designing with Quarkus and Angular.
 4. [ ] Webhook
 5. [ ] SSE (Server-Sent Events)
 6. [ ] WebSocket
-7. [ ] Long Polling / Short Polling
+7. [x] Long Polling / Short Polling
 8. [ ] Kafka
 
 ### Databases:
 1. [x] MongoDB
-2. [ ] PostgreSQL (TODO)
+2. [ ] PostgreSQL
 3. [ ] Redis
 
 ## Other:

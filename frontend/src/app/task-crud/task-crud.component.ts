@@ -1,77 +1,57 @@
+import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { CreateTask, Task } from './task.model';
+import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
+import { TaskCrudAddFormComponent } from './task-crud-add-form/task-crud-add-form.component';
+import { TaskCrudCardComponent } from './task-crud-card/task-crud-card.component';
+import { TaskCrudLinksComponent } from './task-crud-links/task-crud-links.component';
+import {
+  CrudAction,
+  TaskCrudSelectorCrudActionComponent,
+} from './task-crud-selector-crud-action/task-crud-selector-crud-action.component';
+import {
+  LongTimeAction,
+  TaskCrudSelectorLongTimeActionComponent,
+} from './task-crud-selector-long-time-action/task-crud-selector-long-time-action.component';
 import { TaskGraphQLService } from './task-graphql.service';
+import { Task } from './task.model';
 import { TaskRestService } from './task.service';
 import { TaskServiceInterface } from './task.service.interface';
-import { catchError, Observable, of } from 'rxjs';
-
-type TaskAction = 'fetching' | 'adding' | 'updating' | 'deleting';
 
 @Component({
-  standalone: false,
   selector: 'app-task-crud',
+  imports: [
+    TranslatePipe,
+    TaskCrudSelectorCrudActionComponent,
+    TaskCrudSelectorLongTimeActionComponent,
+    TaskCrudLinksComponent,
+    NgIf,
+    NgFor,
+    FormsModule,
+    TaskCrudAddFormComponent,
+    TaskCrudCardComponent,
+  ],
   templateUrl: './task-crud.component.html',
 })
 export class TaskCrudComponent implements OnInit {
   tasks: Task[] = [];
-  newTask: CreateTask = { name: '' };
-  editTask: Task | null = null;
-  useGraphQL: boolean = true;
+  useGraphQL: CrudAction = 'rest-api';
+  longTimeAction: LongTimeAction = 'short-poll';
 
   constructor(
-    private readonly restService: TaskRestService,
-    private readonly graphQLService: TaskGraphQLService
+    public readonly restService: TaskRestService,
+    public readonly graphQLService: TaskGraphQLService
   ) {}
 
-  private get taskService(): TaskServiceInterface {
+  get taskService(): TaskServiceInterface {
     return this.useGraphQL ? this.graphQLService : this.restService;
   }
 
   ngOnInit() {
-    this.loadTasks('fetching');
+    this.loadTasks();
   }
 
-  private loadTasks(action: TaskAction) {
-    if (action === 'adding') {
-      this.newTask = { name: '' };
-    }
-    if (action === 'updating') {
-      this.cancelEdit();
-    }
+  loadTasks() {
     this.taskService.getTasks().subscribe((data) => (this.tasks = data));
-  }
-
-  addTask() {
-    this.handle(this.taskService.addTask(this.newTask), 'adding');
-  }
-
-  startEdit(id: string) {
-    const task = this.tasks.find((task) => task.id === id);
-    if (!task) return;
-    this.editTask = { ...task };
-  }
-
-  updateTask() {
-    if (!this.editTask?.id) return;
-    this.handle(this.taskService.updateTask(this.editTask), 'updating');
-  }
-
-  deleteTask(id: string) {
-    this.handle(this.taskService.deleteTask(id), 'deleting');
-  }
-
-  cancelEdit() {
-    this.editTask = null;
-  }
-
-  handle<T>(observable: Observable<T>, action: TaskAction) {
-    observable
-      .pipe(
-        catchError((err) => {
-          alert(`Error ${action} task: ${err.message}`);
-          return of(null);
-        })
-      )
-      .subscribe(() => this.loadTasks(action));
   }
 }

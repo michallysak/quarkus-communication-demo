@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
-import pl.michallysak.task.domain.Task;
+import pl.michallysak.task.control.Task;
 
 public class BaseIT {
 

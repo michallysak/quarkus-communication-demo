@@ -13,6 +13,10 @@ export class TaskRestService implements TaskServiceInterface {
 
   constructor(private readonly http: HttpClient) {}
 
+  getTask(taskId: string): Observable<Task> {
+    return this.http.get<Task>(`${this.taskApiUrl}/${taskId}`);
+  }
+
   getTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.taskApiUrl);
   }
@@ -31,5 +35,13 @@ export class TaskRestService implements TaskServiceInterface {
 
   deleteAllTasks(): Observable<void> {
     return this.http.delete<void>(`${this.taskApiUrl}`);
+  }
+
+  processTask(taskId: string): Observable<void> {
+    return this.http.patch<void>(`${this.taskApiUrl}/${taskId}/process`, {});
+  }
+
+  longPoll(taskId: string): Observable<Task> {
+    return this.http.get<Task>(`${this.taskApiUrl}/${taskId}/long-poll`);
   }
 }

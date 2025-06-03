@@ -5,7 +5,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class NotFoundExceptionMapper implements ExceptionMapper<TaskNotFoundException> {
+public class TaskNotFoundExceptionMapper implements ExceptionMapper<TaskNotFoundException> {
 
     @Override
     public Response toResponse(TaskNotFoundException exception) {

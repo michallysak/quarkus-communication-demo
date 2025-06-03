@@ -4,6 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pl.michallysak.task.control.TaskController;
@@ -58,6 +60,19 @@ public class TaskResource {
     @DELETE
     public void deleteAll() {
         taskController.deleteAll();
+    }
+
+    @PATCH
+    @Path("/{id}/process")
+    public Response processTask(@PathParam("id") UUID id) {
+        taskController.process(id);
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/{id}/long-poll")
+    public void getByIdWithLongPoll(@PathParam("id") UUID id, @Suspended AsyncResponse asyncResponse) {
+        taskController.getByIdWithLongPoll(id, asyncResponse);
     }
 
 }

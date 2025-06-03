@@ -1,0 +1,16 @@
+<h5 class="mt-4">{{ 'poll-method-process' | translate }}</h5>
+
+<fieldset class="btn-group" aria-label="Polling method toggle">
+  @for (action of actions; track $index) {
+    <input
+      type="radio"
+      class="btn-check"
+      name="pollingToggle"
+      [id]="action"
+      autocomplete="off"
+      [checked]="longTimeAction === action"
+      (change)="updateLongTimeAction(action)"
+    />
+    <label class="btn btn-outline-primary" [for]="action">{{ action }}</label>
+  }
+</fieldset>

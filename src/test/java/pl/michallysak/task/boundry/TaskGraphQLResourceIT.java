@@ -14,9 +14,12 @@ import pl.michallysak.utils.TestDataFactory;
 import pl.michallysak.utils.TestGraphQLFactory;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 @Testcontainers
@@ -173,6 +176,61 @@ class TaskGraphQLResourceIT extends BaseIT {
         TestGraphQLFactory.Tasks.getAll()
             .then().statusCode(200)
             .body("data.allTasks.size()", equalTo(0));
+    }
+
+    @Test
+    void testProcessTask() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestGraphQLFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(200);
+        String id = createResponse.jsonPath().getString("data.createTask.id");
+
+        // when
+        Response response = TestGraphQLFactory.Tasks.processTask(id);
+
+        // then
+        response.then().statusCode(200)
+            .body("data.processTask", equalTo(true));
+    }
+
+    @Test
+    void testProcessTaskAlreadyProcess() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestGraphQLFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(200);
+        String id = createResponse.jsonPath().getString("data.createTask.id");
+        // and
+        TestGraphQLFactory.Tasks.processTask(id).then().statusCode(200)
+            .body("data.processTask", equalTo(true));
+
+        // when
+        Response response = TestGraphQLFactory.Tasks.processTask(id);
+
+        // then
+        response.then().statusCode(200)
+            .body("data.processTask", equalTo(false));
+    }
+
+    @Test
+    void testTaskUpdatesSubscription() {
+        // given
+        TaskCreateDto taskCreateDto = TestDataFactory.Tasks.createTaskCreateDto();
+        Response createResponse = TestGraphQLFactory.Tasks.createTask(taskCreateDto);
+        createResponse.then().statusCode(200);
+        String id = createResponse.jsonPath().getString("data.createTask.id");
+
+        // Prepare GraphQL subscription message
+        Response response = TestGraphQLFactory.Tasks.taskUpdates(id);
+
+        // when: trigger an update
+        TestGraphQLFactory.Tasks.processTask(id).then().statusCode(200);
+
+        // then: expect an update message
+        // TODO graphql use websocket to handle subscription,
+        //  so after implementing websocket change test to use websocket client
+        response.then().body("data.upstreamPublisher", anEmptyMap());
     }
 
     public static Stream<Arguments> invalidTaskNames() {

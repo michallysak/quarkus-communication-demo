@@ -7,10 +7,10 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NotFoundExceptionMapperTest {
+class TaskNotFoundExceptionMapperTest {
 
     private final static UUID TASK_ID = UUID.randomUUID();
-    NotFoundExceptionMapper notFoundExceptionMapper = new NotFoundExceptionMapper();
+    TaskNotFoundExceptionMapper taskNotFoundExceptionMapper = new TaskNotFoundExceptionMapper();
 
     @Test
     void testMappingException() {
@@ -18,7 +18,7 @@ class NotFoundExceptionMapperTest {
         TaskNotFoundException exception = new TaskNotFoundException(TASK_ID);
 
         // when
-        Response response = notFoundExceptionMapper.toResponse(exception);
+        Response response = taskNotFoundExceptionMapper.toResponse(exception);
 
         // then
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());

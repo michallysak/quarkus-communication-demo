@@ -44,6 +44,16 @@ public class TestGraphQLFactory {
             String mutation = String.format("mutation { deleteTask(id: \"%s\") }", id);
             return postQuery(mutation);
         }
+
+        public static Response processTask(String id) {
+            String mutation = String.format("mutation { processTask(id: \"%s\") }", id);
+            return postQuery(mutation);
+        }
+
+        public static Response taskUpdates(String id) {
+            String subscription = String.format("subscription { taskUpdates(id: \"%s\") { id name status } }", id);
+            return postQuery(subscription);
+        }
     }
 
 }

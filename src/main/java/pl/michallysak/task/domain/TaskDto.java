@@ -13,4 +13,5 @@ import java.util.UUID;
 @Schema(description = "Task DTO with a UUID and a name.")
 public class TaskDto extends TaskCreateDto {
     private UUID id;
+    private TaskStatus status;
 }

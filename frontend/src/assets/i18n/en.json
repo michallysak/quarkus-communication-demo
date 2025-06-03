@@ -1,5 +1,6 @@
 {
   "tasks": "Tasks",
+  "noTasks": "No tasks available",
   "swagger_ui": "Swagger UI",
   "edit": "Edit",
   "delete": "Delete",
@@ -7,5 +8,8 @@
   "cancel": "Cancel",
   "add_task": "Add Task",
   "name_placeholder": "Name",
-  "add": "Add"
+  "add": "Add",
+  "process": "Process",
+  "crud-method-process": "Crud method ('add' 'update' 'delete' actions)",
+  "poll-method-process": "Poll method ('process' action)"
 }
